@@ -151,9 +151,8 @@
   .return{display:block;margin:0 auto;padding:7px 22px;background:transparent;border:1px solid #9aa08a;border-radius:999px;color:var(--olive);cursor:pointer;
           font-size:1rem;letter-spacing:.06em;transition:background .2s}
   .return:hover{background:rgba(92,102,72,.1)}
-  h1.title{margin:26px 0 0;text-align:center;font-weight:300;font-size:clamp(3.6rem,19vw,6.2rem);letter-spacing:.24em;text-indent:.24em;line-height:1;color:var(--olive)}
+  h1.title{margin:26px 0 30px;text-align:center;font-weight:300;font-size:clamp(3.6rem,19vw,6.2rem);letter-spacing:.24em;text-indent:.24em;line-height:1;color:var(--olive)}
   h1.title:focus{outline:none}
-  .deadline{margin:14px 0 30px;text-align:center;font-size:.92rem;letter-spacing:.2em;text-indent:.2em;color:var(--olive-soft)}
   .field{margin:0 0 22px;padding:0;border:0;min-width:0}
   .field>label,.field>legend{display:block;padding:0;margin-bottom:8px;font-style:italic;font-size:1.2rem;color:var(--olive-soft)}
   .req{color:var(--error)}
@@ -343,7 +342,7 @@
     </section>
 
     <div class="ktb" aria-label="Katb el-Kitab">
-      <span class="ktb-ar" lang="ar" dir="rtl">كتب الكتاب</span>
+      <span class="ktb-ar" lang="ar" dir="rtl">كتب الكـــتــاب</span>
       <span class="ktb-sub">starts at <b id="ktbTime"></b></span>
     </div>
 
@@ -380,7 +379,6 @@
   <div class="wrap">
     <button class="return" id="returnBtn" type="button">RETURN</button>
     <h1 class="title" id="rsvpTitle" tabindex="-1">RSVP</h1>
-    <p class="deadline">Kindly Respond by <span id="deadline"></span></p>
 
     <form id="rsvpForm" novalidate>
       <div class="field">
@@ -453,7 +451,6 @@
 
   /* ===== EDIT THESE ===== */
   var COUPLE_NAMES  = "Adnan & Yasmine";
-  var RSVP_DEADLINE = "DD Month YYYY";
   // Wedding date & time as YYYY-MM-DDTHH:MM:SS plus the UTC offset of the venue (Cairo = +02:00, or +03:00 in summer time).
   // The displayed date/time is read straight from this text; the countdown counts down to it.
   var WEDDING_DATE  = "2026-11-06T17:00:00+02:00"; // 6 November 2026 at 5 PM (17:00) — change the time if needed
@@ -472,7 +469,6 @@
   // ---- Fill in the editable constants ----
   document.title = COUPLE_NAMES + " — RSVP";
   $('coupleNameEnv').textContent = COUPLE_NAMES;
-  $('deadline').textContent = RSVP_DEADLINE;
   var names = COUPLE_NAMES.split(/\s*&\s*/);
   $('cardName1').textContent = (names[0] || '').toUpperCase();
   $('cardName2').textContent = (names[1] || '').toUpperCase();
