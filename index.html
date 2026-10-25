@@ -521,7 +521,12 @@
 
   // ---- Sound (Web Audio, so volume and fades also work on iPhones) ----
   // Files live in the audio/ folder next to index.html.
-  var SOUND_FILES = { music: 'audio/music.mp3', doves: 'audio/doves.mp3', open: 'audio/envelope-open.mp3', whoosh: 'audio/whoosh.mp3' };
+  var SOUND_FILES = {
+  music: 'music.mp3',
+  doves: 'doves.mp3',
+  open: 'envelope-open.mp3',
+  whoosh: 'whoosh.mp3'
+};
   var AudioCtx = window.AudioContext || window.webkitAudioContext;
   var actx = null, master = null, bufs = {}, musicNode = null, wantMusic = false, soundOff = false;
 
