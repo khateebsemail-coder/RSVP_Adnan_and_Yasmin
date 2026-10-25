@@ -283,6 +283,11 @@
   @keyframes flapN{0%,100%{transform:rotate(14deg) scaleY(1)}50%{transform:rotate(-36deg) scaleY(.82)}}
   @keyframes flapF{0%,100%{transform:rotate(8deg) scaleY(1)}50%{transform:rotate(-30deg) scaleY(.8)}}
 
+  /* sound on/off button */
+  .snd{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:10px;z-index:70;width:42px;height:42px;display:grid;place-items:center;padding:0;border-radius:50%;
+       border:1px solid rgba(201,162,74,.65);background:rgba(255,250,240,.88);color:#8a6414;cursor:pointer;box-shadow:0 4px 10px -4px rgba(90,70,20,.4);transition:transform .15s,background .2s}
+  .snd:hover{transform:scale(1.06)} .snd svg{width:22px;height:22px}
+  .snd .x{display:none} .snd.off .x{display:block} .snd.off .waves{display:none}
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important;transition-duration:.01ms!important;transition-delay:0s!important}
   }
@@ -316,6 +321,15 @@
 
 <!-- White doves carrying olive leaves: they fly left → right over the page during every zoom transition (filled in by the script) -->
 <div id="flock" aria-hidden="true"></div>
+
+<!-- Sound on/off (sound starts when the envelope is tapped) -->
+<button class="snd" id="soundBtn" type="button" aria-pressed="false" aria-label="Turn sound off">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M4 9.5v5h3.6L12 18.5v-13L7.6 9.5H4z" fill="currentColor" fill-opacity=".2"/>
+    <g class="waves"><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></g>
+    <g class="x"><path d="M16 9.5l5 5M21 9.5l-5 5"/></g>
+  </svg>
+</button>
 
 <!-- ================= SCREEN 1: ENVELOPE ================= -->
 <section id="envelope" class="screen" aria-label="Wedding invitation envelope">
@@ -505,6 +519,118 @@
   var $ = function (id) { return document.getElementById(id); };
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // ---- Sound (Web Audio, so volume and fades also work on iPhones) ----
+  // Files live in the audio/ folder next to index.html.
+  var SOUND_FILES = { music: 'audio/music.mp3', doves: 'audio/doves.mp3', open: 'audio/envelope-open.mp3', whoosh: 'audio/whoosh.mp3' };
+  var AudioCtx = window.AudioContext || window.webkitAudioContext;
+  var actx = null, master = null, bufs = {}, musicNode = null, wantMusic = false, soundOff = false;
+
+  if (AudioCtx) {
+    try {
+      actx = new AudioCtx();
+      master = actx.createGain();
+      var limiter = actx.createDynamicsCompressor(); // keeps the layered doves from distorting
+      master.connect(limiter); limiter.connect(actx.destination);
+      Object.keys(SOUND_FILES).forEach(function (name) {
+        fetch(SOUND_FILES[name])
+          .then(function (r) { if (!r.ok) throw new Error('missing'); return r.arrayBuffer(); })
+          .then(function (data) { return new Promise(function (ok, no) { actx.decodeAudioData(data, ok, no); }); })
+          .then(function (buf) { bufs[name] = buf; if (name === 'music' && wantMusic) startMusic(); })
+          .catch(function () { /* no sound file → the page just stays silent for that cue */ });
+      });
+    } catch (e) { actx = null; }
+  }
+
+  // Play one sound. o = { vol, delay, rate, loop, fadeIn, fadeOut, pan:[from,to] }  (seconds)
+  function playSound(name, o) {
+    o = o || {};
+    var buf = bufs[name];
+    if (!actx || !buf) return null;
+    var rate = o.rate || 1, vol = o.vol == null ? 1 : o.vol;
+    var t0 = actx.currentTime + (o.delay || 0);
+    var dur = buf.duration / rate;
+    var src = actx.createBufferSource(); src.buffer = buf; src.playbackRate.value = rate; src.loop = !!o.loop;
+    var g = actx.createGain();
+    var fin = Math.min(o.fadeIn || 0.03, dur / 2), fout = Math.min(o.fadeOut || 0.05, dur / 2);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.linearRampToValueAtTime(vol, t0 + fin);
+    if (!o.loop) {
+      g.gain.setValueAtTime(vol, t0 + dur - fout);
+      g.gain.linearRampToValueAtTime(0.0001, t0 + dur); // smooth fade-away at the end
+    }
+    var out = g;
+    if (o.pan && actx.createStereoPanner) { // sweeps left → right, like the doves flying across
+      var p = actx.createStereoPanner();
+      p.pan.setValueAtTime(o.pan[0], t0);
+      p.pan.linearRampToValueAtTime(o.pan[1], t0 + dur);
+      g.connect(p); out = p;
+    }
+    src.connect(g); out.connect(master);
+    src.start(t0);
+    if (!o.loop) src.stop(t0 + dur + 0.1);
+    return { src: src, g: g };
+  }
+  function fadeOutNode(n, secs) {
+    var now = actx.currentTime;
+    n.g.gain.cancelScheduledValues(now);
+    n.g.gain.setValueAtTime(Math.max(n.g.gain.value, 0.0001), now);
+    n.g.gain.linearRampToValueAtTime(0.0001, now + secs);
+    try { n.src.stop(now + secs + 0.1); } catch (e) {}
+  }
+
+  // 1) tapping the envelope: deep swoosh at 20 % + the envelope-opening sound, which fades away smoothly
+  function sfxOpen() {
+    playSound('whoosh', { vol: 0.2, fadeIn: 0.05, fadeOut: 1.2 });
+    playSound('open', { vol: 0.9, fadeIn: 0.03, fadeOut: 2.2 });
+  }
+  // 2) doves: the recording is layered three times, each layer starting a little later (like the birds setting off one by one),
+  //    panning left → right, fading in gradually and fading away smoothly
+  var DOVE_LAYERS = [
+    { delay: 0,    rate: 1.00, pan: [-0.9, 0.9] },
+    { delay: 0.5,  rate: 0.94, pan: [-0.8, 0.85] },
+    { delay: 0.95, rate: 1.07, pan: [-0.7, 0.9] }
+  ];
+  function playDoves() {
+    DOVE_LAYERS.forEach(function (l) {
+      playSound('doves', { vol: 0.6, rate: l.rate, delay: l.delay, pan: l.pan, fadeIn: 0.7, fadeOut: 1.8 });
+    });
+  }
+  // 3) soft music: starts once the envelope has opened and keeps going while guests fill in the form
+  function startMusic() {
+    wantMusic = true;
+    if (!actx || musicNode || !bufs.music) return;
+    musicNode = playSound('music', { vol: 0.32, loop: true, fadeIn: 3 });
+  }
+  function stopMusic(secs) {
+    wantMusic = false;
+    if (!musicNode) return;
+    fadeOutNode(musicNode, secs || 2);
+    musicNode = null;
+  }
+
+  // browsers only allow sound after a tap: unlock on the first one
+  function unlockAudio() {
+    if (!actx) return;
+    if (actx.state === 'suspended') actx.resume();
+    try { var s = actx.createBufferSource(); s.buffer = actx.createBuffer(1, 1, 22050); s.connect(actx.destination); s.start(0); } catch (e) {}
+  }
+  ['pointerdown', 'touchend', 'keydown'].forEach(function (ev) {
+    document.addEventListener(ev, unlockAudio, { once: true, passive: true });
+  });
+  document.addEventListener('visibilitychange', function () { // no sound from a background tab
+    if (!actx) return;
+    try { if (document.hidden) actx.suspend(); else actx.resume(); } catch (e) {}
+  });
+  var soundBtn = $('soundBtn');
+  if (!actx) soundBtn.hidden = true;
+  soundBtn.addEventListener('click', function () {
+    soundOff = !soundOff;
+    soundBtn.classList.toggle('off', soundOff);
+    soundBtn.setAttribute('aria-pressed', String(soundOff));
+    soundBtn.setAttribute('aria-label', soundOff ? 'Turn sound on' : 'Turn sound off');
+    if (actx) { unlockAudio(); master.gain.setTargetAtTime(soundOff ? 0 : 1, actx.currentTime, 0.12); }
+  });
+
   // ---- Fill in the editable constants ----
   document.title = COUPLE_NAMES + " — RSVP";
   $('coupleNameEnv').textContent = COUPLE_NAMES;
@@ -571,6 +697,7 @@
   }).join('');
   function flyBirds() {
     if (reduceMotion) return;
+    playDoves();
     clearTimeout(flockTimer);
     flock.classList.remove('flying'); void flock.offsetWidth; flock.classList.add('flying');
     flockTimer = setTimeout(function () { flock.classList.remove('flying'); }, 5200);
@@ -602,9 +729,11 @@
   function openEnvelope() {
     if (opening) return;
     opening = true;
+    unlockAudio();
+    sfxOpen();
     envelope.classList.add('opening');
     // start the cross-fade while the flap is still finishing its swing
-    setTimeout(function () { showInvite(envelope); }, reduceMotion ? 0 : 1000);
+    setTimeout(function () { showInvite(envelope); startMusic(); }, reduceMotion ? 0 : 1000);
   }
   envelope.addEventListener('click', openEnvelope);
 
@@ -622,6 +751,7 @@
     setScreen(invite, false);
     envelope.classList.remove('opening');
     opening = false;
+    stopMusic(1.5);
     setScreen(envelope, true);
     $('seal').focus({ preventScroll: true });
   });
@@ -750,6 +880,7 @@
           ? "We'll miss you, but we're sending our love back!"
           : 'Your response has been received.';
         $('thanks').hidden = false;
+        stopMusic(3);
         $('rsvpTitle').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
       })
       .catch(function (err) {
