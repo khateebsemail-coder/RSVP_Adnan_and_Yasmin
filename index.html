@@ -586,7 +586,7 @@
   // 1) tapping the envelope: deep swoosh at 20 % + the envelope-opening sound, which fades away smoothly
   function sfxOpen() {
     playSound('whoosh', { vol: 0.2, fadeIn: 0.05, fadeOut: 1.2 });
-    playSound('open', { vol: 0.9, fadeIn: 0.03, fadeOut: 2.2 });
+    playSound('open', { vol: 0.2, fadeIn: 0.03, fadeOut: 2.2 });
   }
   // 2) doves: the recording is layered three times, each layer starting a little later (like the birds setting off one by one),
   //    panning left → right, fading in gradually and fading away smoothly
@@ -597,14 +597,14 @@
   ];
   function playDoves() {
     DOVE_LAYERS.forEach(function (l) {
-      playSound('doves', { vol: 0.6, rate: l.rate, delay: l.delay, pan: l.pan, fadeIn: 0.7, fadeOut: 1.8 });
+      playSound('doves', { vol: 0.2, rate: l.rate, delay: l.delay, pan: l.pan, fadeIn: 0.7, fadeOut: 1.8 });
     });
   }
   // 3) soft music: starts once the envelope has opened and keeps going while guests fill in the form
   function startMusic() {
     wantMusic = true;
     if (!actx || musicNode || !bufs.music) return;
-    musicNode = playSound('music', { vol: 0.32, loop: true, fadeIn: 3 });
+    musicNode = playSound('music', { vol: 0.25, loop: true, fadeIn: 3 });
   }
   function stopMusic(secs) {
     wantMusic = false;
