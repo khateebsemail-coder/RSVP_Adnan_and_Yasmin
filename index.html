@@ -101,11 +101,23 @@
   .circle{flex:none;width:clamp(110px,33vw,168px);aspect-ratio:1;border-radius:50%;background:#b8b492;display:grid;place-content:center;text-align:center;color:#fffaf0;padding:10px}
   .circle b{display:block;font-weight:500;letter-spacing:.14em;text-transform:uppercase;font-size:clamp(.92rem,4.1vw,1.3rem);line-height:1.2}
   .circle .div{width:84%;margin:8px auto 0;color:#a77c25;font-size:.9rem}
-  .date{flex:1;min-width:0;text-align:center;color:#6a6a52}
-  .date .mo,.date .yr{margin:6px 0;font-size:clamp(.8rem,3.6vw,1.1rem);letter-spacing:.32em;text-indent:.32em}
-  .date .mid{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px}
-  .date .side{border-top:1.5px solid #1b1714;border-bottom:1.5px solid #1b1714;padding:10px 2px;font-size:clamp(.66rem,2.9vw,.92rem);letter-spacing:.18em}
-  .date .day{font-family:var(--script);font-size:clamp(2.2rem,10vw,3.4rem);line-height:1;color:#9a7425;padding:0 2px}
+  /* date card: month on top, big script day between gold rules, year, then weekday + time. Same card look + shine as the كتب الكتاب card */
+  .date{flex:1;min-width:0;text-align:center;color:#6a6a52;padding:15px 8px 15px;border-radius:18px;
+        background:linear-gradient(180deg,#fffdf8,#f5e9d6);border:1px solid rgba(201,162,74,.5);
+        box-shadow:0 8px 16px -8px rgba(130,100,50,.35),inset 0 1px 0 #fff}
+  .date .mo,.date .yr{margin:0;font-size:clamp(.78rem,3.4vw,1rem);letter-spacing:.34em;text-indent:.34em}
+  .dayrow{display:flex;align-items:center;gap:8px;margin:2px 0 0}
+  .dayrow .ln{flex:1;height:1px;background:linear-gradient(90deg,transparent,#b8923a)}
+  .dayrow .ln:last-child{background:linear-gradient(270deg,transparent,#b8923a)}
+  .date .day{font-family:var(--script);font-size:clamp(3.4rem,15vw,4.8rem);line-height:1.05;color:#9a7425;text-shadow:0 2px 6px rgba(150,110,40,.25)}
+  .date .div{width:62%;margin:7px auto 8px;font-size:.8rem}
+  .date .chips{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:3px 8px;font-size:clamp(.64rem,2.8vw,.86rem);letter-spacing:.14em;color:#3a3326;font-weight:500}
+  .date .chips i{font-style:normal;color:#c9a24a;font-size:.8em}
+  /* shared shine sweep (the .save card uses the same idea) */
+  .shine{position:relative;overflow:hidden}
+  .shine::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+    background:linear-gradient(115deg,transparent 36%,rgba(255,255,255,.8) 50%,transparent 64%);background-size:260% 100%;animation:sheen 4.8s ease-in-out infinite}
+  .ktb.shine::after{animation-delay:-2.2s}
   /* كتب الكتاب line */
   .ktb{display:flex;flex-direction:column;align-items:center;gap:2px;margin:18px auto 0;padding:12px 26px 13px;width:max-content;max-width:100%;text-align:center;
        border-radius:18px;background:linear-gradient(180deg,#fffdf8,#f5e9d6);border:1px solid rgba(201,162,74,.5);
@@ -127,7 +139,7 @@
   .story .frame svg{width:92%;transform:translateY(8%)}
   .story p{margin:0;font-size:clamp(.82rem,3.5vw,1.04rem);letter-spacing:.06em;line-height:1.7}
   .sidecol{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
-  .sidecol .b1{width:78%;margin:-4% 0 0 8%;transform:rotate(18deg)}
+  .sidecol .b1{width:78%;margin:-10% 0 0 8%;transform:rotate(18deg)}
   .sidecol .b2{width:74%;transform:rotate(-70deg) scaleX(-1)}
   .rsvp-btn{width:100%;padding:clamp(12px,4vw,18px) 6px;background:linear-gradient(180deg,#7b7432,#5c5720);border:2px solid #c9a24a;border-radius:10px;box-shadow:inset 0 0 0 2px #5c5720,inset 0 0 0 3px #c9a24a,0 6px 14px rgba(60,50,10,.35);
              color:#fbeecf;cursor:pointer;font-weight:500;letter-spacing:.14em;text-transform:uppercase;font-size:clamp(.78rem,3.4vw,1.05rem);transition:transform .2s,filter .2s}
@@ -252,6 +264,24 @@
      Each leaf scales the tilt by its own --k, pivoting from its base, so the branch ripples like it's catching a breeze. */
   .lf{transform-box:fill-box;transform-origin:50% 100%;transform:rotate(calc(var(--sw,0) * var(--k,1) * 1deg))}
   [data-par]{translate:0 calc(var(--py,0) * 1px)}
+  /* The branch next to "Kindly RSVP" floats above the countdown: its shadow lands on the countdown tiles and slides/lengthens as the branch moves while you scroll */
+  .sidecol .b1{z-index:2;filter:drop-shadow(calc(6px + var(--sw,0) * .5px) calc(10px + var(--py,0) * .16px) 4px rgba(50,36,10,.5)) drop-shadow(calc(11px + var(--sw,0) * .8px) calc(18px + var(--py,0) * .22px) 12px rgba(50,36,10,.2))}
+
+  /* ---------- Doves carrying leaves (left → right during page transitions) ---------- */
+  #flock{position:fixed;inset:0;z-index:60;pointer-events:none;overflow:hidden}
+  .bird{position:absolute;left:0;top:var(--top,30%);width:var(--w,110px);opacity:0}
+  .dove{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 6px 7px rgba(70,60,30,.28))}
+  .wn,.wf{transform-box:fill-box;transform-origin:93% 86%}
+  #flock.flying .bird{animation:birdX var(--dur,3.4s) cubic-bezier(.33,.08,.6,.96) var(--delay,0s) both}
+  #flock.flying .arc{animation:birdArc var(--dur,3.4s) ease-in-out var(--delay,0s) both}
+  #flock.flying .bob{animation:birdBob .85s ease-in-out var(--delay,0s) infinite}
+  #flock.flying .wn{animation:flapN .52s ease-in-out var(--delay,0s) infinite}
+  #flock.flying .wf{animation:flapF .52s ease-in-out calc(var(--delay,0s) - .08s) infinite}
+  @keyframes birdX{0%{transform:translateX(-34vw);opacity:0}8%{opacity:1}92%{opacity:1}100%{transform:translateX(118vw);opacity:0}}
+  @keyframes birdArc{0%{transform:translateY(7vh) scale(.6) rotate(6deg)}50%{transform:translateY(-3vh) scale(1) rotate(-3deg)}100%{transform:translateY(-13vh) scale(1.35) rotate(-8deg)}}
+  @keyframes birdBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  @keyframes flapN{0%,100%{transform:rotate(14deg) scaleY(1)}50%{transform:rotate(-36deg) scaleY(.82)}}
+  @keyframes flapF{0%,100%{transform:rotate(8deg) scaleY(1)}50%{transform:rotate(-30deg) scaleY(.8)}}
 
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important;transition-duration:.01ms!important;transition-delay:0s!important}
@@ -264,6 +294,8 @@
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3df98"/><stop offset=".5" stop-color="#c9a24a"/><stop offset="1" stop-color="#e8cf86"/></linearGradient>
+    <linearGradient id="doveWing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9edf2"/></linearGradient>
+    <linearGradient id="doveBody" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e6eaf0"/></linearGradient>
     <g id="leaf"><path d="M0 0C7-10 7-27 0-42-7-27-7-10 0 0Z" fill="url(#gold)" stroke="#9c7626" stroke-width=".8" stroke-opacity=".6"/><path d="M0 0V-34" stroke="#9c7626" stroke-width=".7" stroke-opacity=".5"/></g>
     <g id="leafG"><path d="M0 0C6-9 6-24 0-38-6-24-6-9 0 0Z" fill="#a4ab94" fill-opacity=".55"/></g>
     <symbol id="branch" viewBox="0 0 200 240" overflow="visible">
@@ -281,6 +313,9 @@
     </symbol>
   </defs>
 </svg>
+
+<!-- White doves carrying olive leaves: they fly left → right over the page during every zoom transition (filled in by the script) -->
+<div id="flock" aria-hidden="true"></div>
 
 <!-- ================= SCREEN 1: ENVELOPE ================= -->
 <section id="envelope" class="screen" aria-label="Wedding invitation envelope">
@@ -338,14 +373,16 @@
 
     <section class="when" aria-label="Wedding date">
       <div class="circle"><b>Our<br>Wedding</b><div class="div" aria-hidden="true">&#9829;</div></div>
-      <div class="date">
+      <div class="date shine">
         <div class="mo" id="wdMonth"></div>
-        <div class="mid"><div class="side" id="wdWeekday"></div><div class="day" id="wdDay"></div><div class="side" id="wdTime"></div></div>
+        <div class="dayrow"><span class="ln" aria-hidden="true"></span><div class="day" id="wdDay"></div><span class="ln" aria-hidden="true"></span></div>
         <div class="yr" id="wdYear"></div>
+        <div class="div" aria-hidden="true">&#9829;</div>
+        <div class="chips"><span id="wdWeekday"></span><i aria-hidden="true">&#10022;</i><span id="wdTime"></span></div>
       </div>
     </section>
 
-    <div class="ktb" aria-label="Katb el-Kitab">
+    <div class="ktb shine" aria-label="Katb el-Kitab">
       <span class="ktb-ar" lang="ar" dir="rtl">كتب الكتـــــاب</span>
       <span class="ktb-sub">starts at <b id="ktbTime"></b></span>
     </div>
@@ -365,7 +402,7 @@
         <p id="storyText"></p>
       </div>
       <div class="sidecol">
-        <svg class="b1" viewBox="0 0 200 240" aria-hidden="true" data-par="-.07" data-ph="3"><use href="#branch"/></svg>
+        <svg class="b1" viewBox="0 0 200 240" aria-hidden="true" data-par="-.12" data-ph="3"><use href="#branch"/></svg>
         <button class="rsvp-btn" id="rsvpOpen" type="button">Kindly RSVP &rarr;</button>
         <button class="linkbtn click" id="rsvpOpen2" type="button">Click here</button>
         <svg class="b2" viewBox="0 0 200 240" aria-hidden="true" data-par=".09" data-ph="4.5"><use href="#olive"/></svg>
@@ -508,8 +545,40 @@
 
   // ---- Screen switching: envelope → invitation → RSVP (each change is a smooth cross-fade) ----
   var envelope = $('envelope'), invite = $('invite'), rsvp = $('rsvp'), opening = false;
+  // ---- White doves carrying olive leaves: fly left → right whenever a page zooms in ----
+  var flock = $('flock'), flockTimer = 0;
+  var DOVE = '<svg class="dove" viewBox="0 0 205 120" aria-hidden="true">' +
+    '<g class="wf"><path d="M88 66C84 44 66 24 30 10C38 20 40 27 40 32C32 28 24 28 14 32C26 37 31 44 33 50C25 50 18 53 10 59C32 63 54 68 76 76Z" fill="#dfe4ea" stroke="#cbd2db" stroke-width=".8" stroke-linejoin="round"/></g>' +
+    '<path d="M36 74C24 74 12 76 3 84C14 84 18 87 22 92C28 90 32 90 38 92Z" fill="url(#doveWing)" stroke="#d3d9e1" stroke-width=".8" stroke-linejoin="round"/>' +
+    '<path d="M26 80C40 72 58 66 78 64C94 62 104 58 112 50C114 40 122 33 131 36C139 39 141 48 136 54C132 58 128 60 124 61C116 74 100 84 80 88C56 92 36 90 26 80Z" fill="url(#doveBody)" stroke="#d3d9e1" stroke-width=".8" stroke-linejoin="round"/>' +
+    '<path d="M70 80C80 78 90 74 98 68M62 86C74 84 88 80 98 74" fill="none" stroke="#d9dfe7" stroke-width="1.1" stroke-linecap="round"/>' +
+    '<circle cx="129" cy="44" r="2" fill="#2a2620"/>' +
+    '<path d="M138 46L152 51L138 56Z" fill="#e3a93a" stroke="#b9801f" stroke-width=".6" stroke-linejoin="round"/>' +
+    '<g><path d="M148 52C160 52 172 58 182 72" fill="none" stroke="#a47e2e" stroke-width="1.8" stroke-linecap="round"/>' +
+    '<use href="#leaf" transform="translate(156 53) rotate(40) scale(.5)"/><use href="#leaf" transform="translate(160 55) rotate(150) scale(.5)"/>' +
+    '<use href="#leaf" transform="translate(167 59) rotate(52) scale(.5)"/><use href="#leaf" transform="translate(171 62) rotate(160) scale(.5)"/>' +
+    '<use href="#leaf" transform="translate(178 68) rotate(60) scale(.46)"/><use href="#leaf" transform="translate(182 72) rotate(130) scale(.5)"/></g>' +
+    '<g class="wn"><path d="M96 70C90 46 70 24 28 8C37 19 40 27 40 33C31 29 22 29 10 34C24 40 30 47 32 54C23 54 15 58 6 65C30 68 56 74 82 84Z" fill="url(#doveWing)" stroke="#cdd4dd" stroke-width=".9" stroke-linejoin="round"/>' +
+    '<path d="M40 33C58 40 76 52 90 70M32 54C52 58 70 66 86 80" fill="none" stroke="#dde2e9" stroke-width="1" stroke-linecap="round"/></g></svg>';
+  var FLOCK = [ // [top, width, flight seconds, start delay seconds]
+    ['12%', 'clamp(88px,26vw,150px)', 3.5, 0],
+    ['30%', 'clamp(62px,17vw,100px)', 4.0, .28],
+    ['50%', 'clamp(104px,30vw,170px)', 3.3, .5],
+    ['68%', 'clamp(70px,20vw,112px)', 3.8, .85]
+  ];
+  flock.innerHTML = FLOCK.map(function (b) {
+    return '<div class="bird" style="--top:' + b[0] + ';--w:' + b[1] + ';--dur:' + b[2] + 's;--delay:' + b[3] + 's"><div class="arc"><div class="bob">' + DOVE + '</div></div></div>';
+  }).join('');
+  function flyBirds() {
+    if (reduceMotion) return;
+    clearTimeout(flockTimer);
+    flock.classList.remove('flying'); void flock.offsetWidth; flock.classList.add('flying');
+    flockTimer = setTimeout(function () { flock.classList.remove('flying'); }, 5200);
+  }
+
   function setScreen(el, on) {
     if (on) {
+      flyBirds();
       // arriving: jump (no animation) back to the "wide" starting size, then zoom in to full size
       el.classList.add('no-trans');
       el.classList.remove('exited');
