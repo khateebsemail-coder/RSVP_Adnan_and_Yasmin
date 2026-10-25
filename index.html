@@ -134,9 +134,7 @@
   .rsvp-btn:hover{filter:brightness(1.12)} .rsvp-btn:active{transform:scale(.98)}
   .linkbtn{background:none;border:0;padding:4px 2px;cursor:pointer;color:#2a2018;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:1.5px;text-transform:uppercase;letter-spacing:.04em;font-weight:500}
   .click{font-size:clamp(1.05rem,4.8vw,1.45rem)}
-  .contact{margin:30px 0 8px;text-align:center;letter-spacing:.1em;line-height:1.7;font-size:clamp(.9rem,3.8vw,1.1rem)}
-  .contact a{color:inherit}
-  .hope{margin:14px 0 30px;text-align:center;text-transform:uppercase;letter-spacing:.14em;font-size:clamp(.95rem,4vw,1.2rem)}
+  .hope{margin:40px 0 30px;text-align:center;text-transform:uppercase;letter-spacing:.14em;font-size:clamp(.95rem,4vw,1.2rem)}
   .back-env{display:block;margin:0 auto;font-size:clamp(1.15rem,5.4vw,1.7rem)}
   /* gentle one-time entrance for the invitation content */
   #invite:not(.is-hidden) .hero,#invite:not(.is-hidden) .when,#invite:not(.is-hidden) .cd,#invite:not(.is-hidden) .lower{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
@@ -250,6 +248,11 @@
   .submit:hover{background:linear-gradient(180deg,#cdd5b6,#b2bf92);transform:translateY(-1px)}
   .return{background:rgba(255,255,255,.5);box-shadow:0 2px 6px -3px rgba(70,80,50,.3)}
 
+  /* Scroll-reactive leaves: JS feeds --sw (tilt, degrees) and --py (drift, px) while the page scrolls.
+     Each leaf scales the tilt by its own --k, pivoting from its base, so the branch ripples like it's catching a breeze. */
+  .lf{transform-box:fill-box;transform-origin:50% 100%;transform:rotate(calc(var(--sw,0) * var(--k,1) * 1deg))}
+  [data-par]{translate:0 calc(var(--py,0) * 1px)}
+
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important;transition-duration:.01ms!important;transition-delay:0s!important}
   }
@@ -265,11 +268,12 @@
     <g id="leafG"><path d="M0 0C6-9 6-24 0-38-6-24-6-9 0 0Z" fill="#a4ab94" fill-opacity=".55"/></g>
     <symbol id="branch" viewBox="0 0 200 240" overflow="visible">
       <path d="M100 236C96 180 104 100 100 16" stroke="#a47e2e" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-      <use href="#leaf" transform="translate(99 205) rotate(-58) scale(1.1)"/><use href="#leaf" transform="translate(101 200) rotate(58) scale(1.1)"/>
-      <use href="#leaf" transform="translate(98 165) rotate(-52) scale(1.25)"/><use href="#leaf" transform="translate(102 158) rotate(52) scale(1.3)"/>
-      <use href="#leaf" transform="translate(99 120) rotate(-46) scale(1.25)"/><use href="#leaf" transform="translate(101 112) rotate(46) scale(1.25)"/>
-      <use href="#leaf" transform="translate(100 72) rotate(-36) scale(1.05)"/><use href="#leaf" transform="translate(100 66) rotate(36) scale(1.05)"/>
-      <use href="#leaf" transform="translate(100 18) scale(1.1)"/>
+      <!-- each leaf sits in a positioned <g>; the inner <use class="lf"> is what flutters (--k = how much that leaf reacts to the scroll) -->
+      <g transform="translate(99 205) rotate(-58) scale(1.1)"><use class="lf" style="--k:.5" href="#leaf"/></g><g transform="translate(101 200) rotate(58) scale(1.1)"><use class="lf" style="--k:.45" href="#leaf"/></g>
+      <g transform="translate(98 165) rotate(-52) scale(1.25)"><use class="lf" style="--k:.8" href="#leaf"/></g><g transform="translate(102 158) rotate(52) scale(1.3)"><use class="lf" style="--k:.7" href="#leaf"/></g>
+      <g transform="translate(99 120) rotate(-46) scale(1.25)"><use class="lf" style="--k:1.1" href="#leaf"/></g><g transform="translate(101 112) rotate(46) scale(1.25)"><use class="lf" style="--k:.95" href="#leaf"/></g>
+      <g transform="translate(100 72) rotate(-36) scale(1.05)"><use class="lf" style="--k:1.4" href="#leaf"/></g><g transform="translate(100 66) rotate(36) scale(1.05)"><use class="lf" style="--k:1.25" href="#leaf"/></g>
+      <g transform="translate(100 18) scale(1.1)"><use class="lf" style="--k:1.8" href="#leaf"/></g>
     </symbol>
     <symbol id="olive" viewBox="0 0 200 240" overflow="visible">
       <use href="#branch"/>
@@ -322,8 +326,8 @@
         <div class="lining"><svg viewBox="0 0 100 90" preserveAspectRatio="xMidYMid slice"><use href="#leafG" transform="translate(20 80) rotate(-30) scale(1.1)"/><use href="#leafG" transform="translate(34 84) rotate(25) scale(1)"/><use href="#leafG" transform="translate(50 86) rotate(-8) scale(1.2)"/><use href="#leafG" transform="translate(66 84) rotate(28) scale(1)"/><use href="#leafG" transform="translate(80 80) rotate(-28) scale(1.1)"/><use href="#leafG" transform="translate(14 58) rotate(-40) scale(1)"/><use href="#leafG" transform="translate(30 62) rotate(22) scale(1.1)"/><use href="#leafG" transform="translate(50 64) rotate(0) scale(1.25)"/><use href="#leafG" transform="translate(70 62) rotate(-22) scale(1.1)"/><use href="#leafG" transform="translate(86 58) rotate(40) scale(1)"/><use href="#leafG" transform="translate(22 36) rotate(-25) scale(0.9)"/><use href="#leafG" transform="translate(40 40) rotate(15) scale(1)"/><use href="#leafG" transform="translate(60 40) rotate(-15) scale(1)"/><use href="#leafG" transform="translate(78 36) rotate(25) scale(0.9)"/><use href="#leafG" transform="translate(50 24) rotate(0) scale(0.9)"/></svg></div>
         <div class="pocket"><i class="pl"></i><i class="pr"></i><i class="pb"></i></div>
       </div>
-      <svg class="h-b1" viewBox="0 0 200 240" aria-hidden="true"><use href="#olive"/></svg>
-      <svg class="h-b2" viewBox="0 0 200 240" aria-hidden="true"><use href="#olive"/></svg>
+      <svg class="h-b1" viewBox="0 0 200 240" aria-hidden="true" data-par=".10" data-ph="0" data-anchor="top"><use href="#olive"/></svg>
+      <svg class="h-b2" viewBox="0 0 200 240" aria-hidden="true" data-par=".14" data-ph="1.6" data-anchor="top"><use href="#olive"/></svg>
       <div class="save">
         <p class="std">Save the date</p>
         <div class="div" aria-hidden="true">&#9829;</div>
@@ -357,18 +361,17 @@
       <div class="story">
         <h2>Our Story</h2>
         <div class="div" aria-hidden="true">&#9829;</div>
-        <div class="frame" aria-hidden="true"><svg viewBox="0 0 200 240"><use href="#olive"/></svg></div>
+        <div class="frame" aria-hidden="true"><svg viewBox="0 0 200 240" data-par="0" data-ph="2.4"><use href="#olive"/></svg></div>
         <p id="storyText"></p>
       </div>
       <div class="sidecol">
-        <svg class="b1" viewBox="0 0 200 240" aria-hidden="true"><use href="#branch"/></svg>
+        <svg class="b1" viewBox="0 0 200 240" aria-hidden="true" data-par="-.07" data-ph="3"><use href="#branch"/></svg>
         <button class="rsvp-btn" id="rsvpOpen" type="button">Kindly RSVP &rarr;</button>
         <button class="linkbtn click" id="rsvpOpen2" type="button">Click here</button>
-        <svg class="b2" viewBox="0 0 200 240" aria-hidden="true"><use href="#olive"/></svg>
+        <svg class="b2" viewBox="0 0 200 240" aria-hidden="true" data-par=".09" data-ph="4.5"><use href="#olive"/></svg>
       </div>
     </section>
 
-    <p class="contact">For any questions, please contact us at:<br><a id="contactLink" href="#"></a></p>
     <p class="hope">We hope you can join us</p>
     <button class="linkbtn back-env" id="backEnv" type="button">Return to envelope...</button>
   </div>
@@ -455,7 +458,6 @@
   // The displayed date/time is read straight from this text; the countdown counts down to it.
   var WEDDING_DATE  = "2026-11-06T17:00:00+02:00"; // 6 November 2026 at 5 PM (17:00) — change the time if needed
   var KATB_KITAB_TIME = "15:00";                    // كتب الكتاب starts at 3 PM (24-hour HH:MM, same day as the wedding)
-  var CONTACT_EMAIL = "your-email@example.com";
   var STORY_TEXT    = "Every love story is unique, but ours is our favorite. Through laughter, adventures, and countless unforgettable moments, we found a forever worth celebrating.";
   var FORM_ENDPOINT = "https://script.google.com/macros/s/AKfycbwWjZwMpLGXpwVQ-WhbsCFwRNUCK2fa8C_uoywzWoTWpZVUJKdLiTUZcpmP7XdqyZq-/exec"; // same URL as DASHBOARD_ENDPOINT in host.html
   /* ====================== */
@@ -473,8 +475,6 @@
   $('cardName1').textContent = (names[0] || '').toUpperCase();
   $('cardName2').textContent = (names[1] || '').toUpperCase();
   $('storyText').textContent = STORY_TEXT;
-  $('contactLink').textContent = CONTACT_EMAIL;
-  $('contactLink').href = 'mailto:' + CONTACT_EMAIL;
 
   // Date block: read the wall-clock date/time straight from WEDDING_DATE so every guest sees the same thing.
   var dm = WEDDING_DATE.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
@@ -555,6 +555,45 @@
     setScreen(envelope, true);
     $('seal').focus({ preventScroll: true });
   });
+
+  // ---- Scroll-reactive leaves ----
+  // While the invitation scrolls, every leaf tilts according to how fast you're scrolling (it lags behind and swings back),
+  // and the branches drift a little at different speeds. Motion is eased so it feels soft, then settles when you stop.
+  (function () {
+    if (reduceMotion) return;
+    var els = [].slice.call(invite.querySelectorAll('[data-par]'));
+    if (!els.length) return;
+    var cur = invite.scrollTop, target = cur, raf = 0, measured = false;
+
+    function measure() {
+      var vh = invite.clientHeight;
+      els.forEach(function (el) {
+        var p = el.parentElement;
+        el._a = el.getAttribute('data-anchor') === 'top' ? 0 : p.offsetTop + p.offsetHeight / 2 - vh / 2;
+      });
+      measured = true;
+    }
+    function frame() {
+      cur += (target - cur) * 0.12;                       // ease toward the real scroll position
+      var lag = target - cur;                             // how far behind we are = how fast you're scrolling
+      var tilt = Math.max(-16, Math.min(16, lag * 0.4));  // lean with the scroll speed
+      els.forEach(function (el) {
+        var rate = parseFloat(el.getAttribute('data-par')) || 0;
+        var ph = parseFloat(el.getAttribute('data-ph')) || 0;
+        var drift = Math.max(-45, Math.min(45, (cur - el._a) * rate));
+        var wave = (Math.sin(cur / 80 + ph) - Math.sin(ph)) * 5; // gentle position-based sway (0 at the very top)
+        el.style.setProperty('--py', drift.toFixed(1));
+        el.style.setProperty('--sw', (tilt + wave).toFixed(2));
+      });
+      raf = Math.abs(lag) > 0.05 ? requestAnimationFrame(frame) : 0;
+    }
+    invite.addEventListener('scroll', function () {
+      if (!measured) measure();
+      target = invite.scrollTop;
+      if (!raf) raf = requestAnimationFrame(frame);
+    }, { passive: true });
+    window.addEventListener('resize', function () { measured = false; });
+  })();
 
   // ---- Form logic ----
   var form = $('rsvpForm'), btn = $('submitBtn'), sending = false;
